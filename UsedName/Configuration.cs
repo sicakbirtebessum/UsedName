@@ -6,7 +6,7 @@ using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Linq;
-using Dalamud;
+using Dalamud.Game;
 using Dalamud.Utility;
 
 namespace UsedName

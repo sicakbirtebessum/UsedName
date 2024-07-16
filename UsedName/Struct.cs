@@ -1,4 +1,5 @@
 ﻿using Dalamud.Utility;
+using FFXIVClientStructs.FFXIV.Client.UI.Info;
 using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections;
@@ -24,7 +25,7 @@ public enum ListType : byte
     NewAdventurer = 11
 }
 
-[StructLayout(LayoutKind.Explicit, Size = 0x420)]
+[StructLayout(LayoutKind.Explicit, Size = 0x470)]
 public unsafe struct SocialListResult
 {
     [FieldOffset(0x00)] public ulong CommunityID;
@@ -36,7 +37,7 @@ public unsafe struct SocialListResult
     [FieldOffset(0x0F)] private byte __padding1;
     [FieldOffset(0x10)]
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10)]
-    public CharacterEntry[] CharacterEntries;
+    public InfoProxyCommonList.CharacterData[] CharacterEntries;
 
     public ListType? ListType
     {
@@ -51,7 +52,10 @@ public unsafe struct SocialListResult
         set { }
     }
 }
-[StructLayout(LayoutKind.Explicit, Size = 0x68, Pack = 1)]
+
+
+
+[StructLayout(LayoutKind.Explicit, Size = 0x70, Pack = 1)]
 public unsafe struct CharacterEntry
 {
     [FieldOffset(0x00)] public ulong CharacterID;

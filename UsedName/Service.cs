@@ -1,9 +1,7 @@
 ﻿using Dalamud.Game;
 using Dalamud.IoC;
 using Dalamud.Plugin;
-using XivCommon;
-using Dalamud.ContextMenu;
-using Dalamud.Interface.Windowing;
+//using XivCommon;
 using UsedName.GUI;
 using UsedName.Manager;
 using Dalamud.Plugin.Services;
@@ -20,13 +18,11 @@ namespace UsedName
         internal static ConfigWindow ConfigWindow { get; set; } = null!;
         internal static EditingWindow EditingWindow { get; set; } = null!;
         internal static SubscriptionWindow SubscriptionWindow { get; set; } = null!;
-        internal static XivCommonBase Common { get; set; } = null!;
-        internal static DalamudContextMenu ContextMenu { get; set; } = null!;
+        //internal static XivCommonBase Common { get; set; } = null!;
         internal static Localization Loc { get; set; } = null!;
-        internal static WindowSystem WindowSystem { get; set; } = null!;
 
         [PluginService]
-        internal static DalamudPluginInterface PluginInterface { get; private set; } = null!;
+        internal static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
         [PluginService]
         internal static ISigScanner Scanner { get; private set; } = null!;
         [PluginService]
@@ -41,5 +37,7 @@ namespace UsedName
         internal static IGameInteropProvider GameInteropProvider { get; private set; } = null!;
         [PluginService]
         internal static IPluginLog PluginLog { get; private set; } = null!;
+        [PluginService]
+        internal static IContextMenu ContextMenu { get; set; } = null!;
     }
 }

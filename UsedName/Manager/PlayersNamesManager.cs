@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -11,16 +12,16 @@ namespace UsedName.Manager
 
         public List<string> Subscriptions = new List<string>();
 
-        public List<ulong> NotInGameFriendListFriend()
-        {
-            var currentFriendList = Service.GameDataManager.GetDataFromXivCommon();
-            if (currentFriendList == null) return new List<ulong>();
-            var currentFriendListIDs = currentFriendList.Keys;
-            var savedFriendListIDs = Service.Configuration.playersNameList.Keys;
-            return savedFriendListIDs.Except(currentFriendListIDs).ToList();
-        }
-        
-        public void UpdatePlayerNames(IDictionary<ulong, string> currentPlayersList, bool showHint = true)
+        //public List<ulong> NotInGameFriendListFriend()
+        //{
+        //    var currentFriendList = Service.GameDataManager.GetDataFromXivCommon();
+        //    if (currentFriendList == null) return new List<ulong>();
+        //    var currentFriendListIDs = currentFriendList.Keys;
+        //    var savedFriendListIDs = Service.Configuration.playersNameList.Keys;
+        //    return savedFriendListIDs.Except(currentFriendListIDs).ToList();
+        //}
+
+        public void UpdatePlayerNames(IDictionary<ulong, string> currentPlayersList, IList<String> newlyAddedPlayersFromSub, bool showHint = true)
         {
             var savedFriendList = Service.Configuration.playersNameList;
             bool same = true;
@@ -57,6 +58,14 @@ namespace UsedName.Manager
             }
             if (showHint)
             {
+                if (newlyAddedPlayersFromSub.Count > 0)
+                {
+                    foreach (var player in newlyAddedPlayersFromSub)
+                    {
+                        Service.Chat.Print(string.Format(Service.Loc.Localize($"Successfully added {0} to plguin's player list"), player));
+                    }
+                }
+
                 Service.Chat.Print(Service.Loc.Localize("Update FriendList completed"));
             }
         }
@@ -90,10 +99,10 @@ namespace UsedName.Manager
         public string SearchPlayerResult(string targetName)
         {
             StringBuilder resultBuilder = new StringBuilder();
-            foreach (var player in SearchPlayer(targetName, true,false))
+            foreach (var player in SearchPlayer(targetName, true, false))
             {
                 var temp = string.IsNullOrEmpty(player.Value.nickName) ? "" : "(" + player.Value.nickName + ")";
-                resultBuilder.Append( $"{player.Value.currentName}{temp}: [{string.Join(",", player.Value.usedNames)}]\n");
+                resultBuilder.Append($"{player.Value.currentName}{temp}: [{string.Join(",", player.Value.usedNames)}]\n");
             }
             string result = resultBuilder.ToString();
             Service.Chat.Print(string.Format(Service.Loc.Localize("Search result(s) for target [{0}]:"), targetName) + $"\n{result}");

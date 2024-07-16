@@ -30,7 +30,8 @@ namespace UsedName
         {
             if (args == "update" || args == "")
             {
-                Service.GameDataManager.UpdateDataFromXivCommon();
+                //Service.GameDataManager.UpdateDataFromXivCommon();
+
             }
             else if (args.StartsWith("search"))
             {

@@ -1,39 +1,32 @@
 ﻿using System;
 using System.Linq;
-using Dalamud.ContextMenu;
+using Dalamud.Game.Gui.ContextMenu;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Lumina.Excel.GeneratedSheets;
 
 namespace UsedName;
 
-public class ContextMenu : IDisposable
+public class ContextMenu
 {
-    public ContextMenu()
+    public static void Enable()
     {
-        Enable();
+        Service.ContextMenu.OnMenuOpened -=     OnOpenContextMenu;
+        Service.ContextMenu.OnMenuOpened += OnOpenContextMenu;
     }
 
-    public void Enable()
+    public static void Disable()
     {
-        Service.ContextMenu.OnOpenGameObjectContextMenu -= OnOpenContextMenu;
-        Service.ContextMenu.OnOpenGameObjectContextMenu += OnOpenContextMenu;
+        Service.ContextMenu.OnMenuOpened -= OnOpenContextMenu;
     }
 
-    public void Disable()
+    private static bool IsMenuValid(IMenuArgs menuOpenedArgs)
     {
-        Service.ContextMenu.OnOpenGameObjectContextMenu -= OnOpenContextMenu;
-    }
-
-    public void Dispose()
-    {
-        Disable();
-        GC.SuppressFinalize(this);
-    }
-
-    private static bool IsMenuValid(BaseContextMenuArgs args)
-    {
-        switch (args.ParentAddonName)
+        if (menuOpenedArgs.Target is not MenuTargetDefault menuTargetDefault)
+        {
+            return false;
+        }
+        switch (menuOpenedArgs.AddonName)
         {
             case null: // Nameplate/Model menu
             case "LookingForGroup":
@@ -48,44 +41,65 @@ public class ContextMenu : IDisposable
             case "CrossWorldLinkshell":
             case "ContentMemberList": // Eureka/Bozja/...
             case "BeginnerChatList":
-                return args.Text != null && args.ObjectWorld != 0 && args.ObjectWorld != 65535;
+                return menuTargetDefault.TargetName != null && menuTargetDefault.TargetHomeWorld.Id != 0 && menuTargetDefault.TargetHomeWorld.Id != 65535;
+            case "BlackList":
+                return menuTargetDefault.TargetName != string.Empty;
 
             default:
                 return false;
         }
     }
 
-    private void OnOpenContextMenu(GameObjectContextMenuOpenArgs args)
+    private static void OnOpenContextMenu(IMenuOpenedArgs menuOpenedArgs)
     {
-        if (!IsMenuValid(args))
+        if (menuOpenedArgs.Target is not MenuTargetDefault menuTargetDefault)
+        {
+            return;
+        }
+        if (!IsMenuValid(menuOpenedArgs))
             return;
 
         if (Service.Configuration.EnableSearchInContext)
         {
-            args.AddCustomItem(
-                new GameObjectContextMenuItem(new SeString(new TextPayload(Service.Configuration.SearchString)), Search,
-                    true));
+            menuOpenedArgs.AddMenuItem(new MenuItem { 
+                PrefixChar = 'U',
+                Name = Service.Configuration.SearchString,
+                OnClicked = Search
+            });
         }
 
-        var playerName = (args.Text ?? new SeString()).ToString();
+        var playerName = (menuTargetDefault.TargetName ?? new SeString()).ToString();
         var playerInPluginFriendList = Service.PlayersNamesManager.SearchPlayer(playerName).Count >= 1;
+
         if (Service.Configuration.EnableAddNickName)
         {
-            args.AddCustomItem(new GameObjectContextMenuItem(
-                new SeString(new TextPayload(Service.Configuration.AddNickNameString)), AddNickName, true));
+            menuOpenedArgs.AddMenuItem(new MenuItem
+            {
+                PrefixChar = 'U',
+                Name = Service.Configuration.AddNickNameString,
+                OnClicked = AddNickName
+            });
         }
 
         if (Service.Configuration.EnableSubscription && !playerInPluginFriendList &&
             !Service.PlayersNamesManager.Subscriptions.Exists(x => x == playerName))
         {
-            args.AddCustomItem(new GameObjectContextMenuItem(
-                new SeString(new TextPayload(Service.Configuration.SubscriptionString)), AddSubscription, true));
+            menuOpenedArgs.AddMenuItem(new MenuItem
+            {
+                PrefixChar = 'U',
+                Name = Service.Configuration.SubscriptionString,
+                OnClicked = AddSubscription
+            });
         }
     }
 
-    private void AddNickName(GameObjectContextMenuItemSelectedArgs args)
+    private static void AddNickName(IMenuArgs args)
     {
-        var playerName = (args.Text ?? new SeString()).ToString();
+        if (args.Target is not MenuTargetDefault menuTargetDefault)
+        {
+            return;
+        }
+        var playerName = (menuTargetDefault.TargetName ?? new SeString()).ToString();
         Service.PlayersNamesManager.TempPlayerName = playerName;
         var searchResult = Service.PlayersNamesManager.SearchPlayer(playerName);
         Service.PlayersNamesManager.TempPlayerID = searchResult.Count > 0 ? searchResult.First().Key : (ulong)0;
@@ -93,12 +107,16 @@ public class ContextMenu : IDisposable
         Service.EditingWindow.IsOpen = true;
     }
 
-    private void AddSubscription(GameObjectContextMenuItemSelectedArgs args)
+    private static void AddSubscription(IMenuArgs args)
     {
-        var world = Service.DataManager.GetExcelSheet<World>()?.FirstOrDefault(x => x.RowId == args.ObjectWorld);
+        if (args.Target is not MenuTargetDefault menuTargetDefault)
+        {
+            return;
+        }
+        var world = Service.DataManager.GetExcelSheet<World>()?.FirstOrDefault(x => x.RowId == menuTargetDefault.TargetHomeWorld.Id);
         if (world == null)
             return;
-        var playerName = (args.Text ?? new SeString()).ToString();
+        var playerName = (menuTargetDefault.TargetName ?? new SeString()).ToString();
         if (string.IsNullOrEmpty(playerName))
             return;
         Service.PlayersNamesManager.Subscriptions.Add(playerName);
@@ -106,9 +124,13 @@ public class ContextMenu : IDisposable
         Service.Chat.Print(String.Format(Service.Loc.Localize("Added {0} to subscription list"), playerName));
     }
 
-    private void Search(GameObjectContextMenuItemSelectedArgs args)
+    private static void Search(IMenuItemClickedArgs args)
     {
-        var target = (args.Text ?? new SeString()).ToString(); ;
+        if (args.Target is not MenuTargetDefault menuTargetDefault)
+        {
+            return;
+        }
+        var target = (menuTargetDefault.TargetName ?? new SeString()).ToString(); ;
         if (!string.IsNullOrEmpty(target))
         {
             Service.PlayersNamesManager.SearchPlayerResult(target);

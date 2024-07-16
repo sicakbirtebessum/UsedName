@@ -1,4 +1,5 @@
 ﻿using Dalamud;
+using Dalamud.Game;
 using Lumina.Excel;
 
 namespace UsedName;

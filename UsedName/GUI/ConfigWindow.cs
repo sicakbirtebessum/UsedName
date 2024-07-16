@@ -29,7 +29,8 @@ namespace UsedName.GUI
         {
             if (ImGui.Button(Service.Loc.Localize("Update FriendList")))
             {
-                Service.GameDataManager.UpdateDataFromXivCommon();
+                //Service.GameDataManager.UpdateDataFromXivCommon();
+                Service.Chat.Print("The current function is not available");
             }
             ImGui.SameLine();
             if (ImGui.Button(Service.Loc.Localize("Open Main Window")))
