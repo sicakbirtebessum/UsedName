@@ -34,19 +34,28 @@ namespace UsedName.Manager
             this.GetSocialListHook?.Dispose();
         }
 
+
         private void GetSocialListDetour(uint targetId, IntPtr data)
         {
 #if DEBUG
-            //int startIndex = 0x10;
-            //int endIndex = startIndex + 0x70;
+            int startIndex = 0x10;
+            int endIndex = startIndex + 0x70;
+            var bytes = new byte[endIndex - startIndex];
+            Marshal.Copy(data + startIndex, bytes, 0, bytes.Length);
+            Service.PluginLog.Debug($"GetSocialListDetour 1: {BitConverter.ToString(bytes)}");
+            startIndex = endIndex;
+            endIndex = startIndex + 0x70;
+            Marshal.Copy(data + startIndex, bytes, 0, bytes.Length);
+            Service.PluginLog.Debug($"GetSocialListDetour 2: {BitConverter.ToString(bytes)}");
+            startIndex = endIndex;
+            endIndex = startIndex + 0x70;
+            Marshal.Copy(data + startIndex, bytes, 0, bytes.Length);
+            Service.PluginLog.Debug($"GetSocialListDetour 3: {BitConverter.ToString(bytes)}");
+            //int startIndex = 0;
+            //int endIndex = startIndex + 0x70 + 50;
             //var bytes = new byte[endIndex - startIndex];
             //Marshal.Copy(data + startIndex, bytes, 0, bytes.Length);
             //Service.PluginLog.Debug($"GetSocialListDetour: {BitConverter.ToString(bytes)}");
-            int startIndex = 0;
-            int endIndex = startIndex + 0x70 + 50;
-            var bytes = new byte[endIndex - startIndex];
-            Marshal.Copy(data + startIndex, bytes, 0, bytes.Length);
-            Service.PluginLog.Debug($"GetSocialListDetour: {BitConverter.ToString(bytes)}");
 #endif
             SocialListResult socialList;
             try
@@ -58,7 +67,7 @@ namespace UsedName.Manager
                 this.GetSocialListHook?.Original(targetId, data);
                 return;
             }
-            
+
             this.GetSocialListHook?.Original(targetId, data);
             var listType = socialList.ListType;
             Service.PluginLog.Debug($"CommunityID:{socialList.CommunityID:X}:{socialList.Index}:{socialList.NextIndex}:{socialList.RequestKey}:{socialList.RequestParam}");
@@ -74,8 +83,8 @@ namespace UsedName.Manager
                 Service.Chat.Print(hint);
                 foreach (var character in socialList.CharacterEntries)
                 {
+                    hint += $"\n{character.CharacterID:X}:{character.CharacterName}";
                     //hint += $"\n{character.CharacterID:X}:{character.CharacterName}";
-                    hint += $"\n{character.ContentId:X}:{character.NameString}";
                 }
                 Service.PluginLog.Warning(hint);
 #endif
@@ -94,38 +103,38 @@ namespace UsedName.Manager
             foreach (var c in socialList.CharacterEntries)
             {
 #if DEBUG
-                Service.PluginLog.Debug($"{c.Job} {c.HomeWorld} {c.ContentId} {c.ClientLanguage}");
+                Service.PluginLog.Debug($"{c.CharacterName} {c.FcTag} {c.CharacterID} ");
 #endif
-                //if (c.CharacterID == 0 ||
-                //    c.CharacterID == Service.ClientState.LocalContentId ||
-                //    c.CharacterName.IsNullOrEmpty())
-                //    continue;
-
-                //if (subList.RemoveAll(x => x == c.CharacterName)>0 || 
-                //    // notInGameFriendListFriend.Exists(id => id == c.CharacterID) ||
-                //    Service.Configuration.playersNameList.ContainsKey(c.CharacterID) ||
-                //    recordAllPlayersInList)
-                //{
-                //    if (!result.TryAdd(c.CharacterID, c.CharacterName))
-                //    {
-                //        Service.PluginLog.Warning($"Duplicate entry {c.CharacterID} {c.CharacterName}");
-                //    }
-                //}
-                if (c.ContentId == 0 ||
-                    c.ContentId == Service.ClientState.LocalContentId ||
-                    c.NameString.IsNullOrEmpty())
+                if (c.CharacterID == 0 ||
+                    c.CharacterID == Service.ClientState.LocalContentId ||
+                    c.CharacterName.IsNullOrEmpty())
                     continue;
 
-                if (subList.RemoveAll(x => x == c.NameString) > 0 ||
+                if (subList.RemoveAll(x => x == c.CharacterName) > 0 ||
                     // notInGameFriendListFriend.Exists(id => id == c.CharacterID) ||
-                    Service.Configuration.playersNameList.ContainsKey(c.ContentId) ||
+                    Service.Configuration.playersNameList.ContainsKey(c.CharacterID) ||
                     recordAllPlayersInList)
                 {
-                    if (!result.TryAdd(c.ContentId, c.NameString))
+                    if (!result.TryAdd(c.CharacterID, c.CharacterName))
                     {
-                        Service.PluginLog.Warning($"Duplicate entry {c.ContentId} {c.NameString}");
+                        Service.PluginLog.Warning($"Duplicate entry {c.CharacterID} {c.CharacterName}");
                     }
                 }
+                //if (c.ContentId == 0 ||
+                //    c.ContentId == Service.ClientState.LocalContentId ||
+                //    c.NameString.IsNullOrEmpty())
+                //    continue;
+
+                //if (subList.RemoveAll(x => x == c.NameString) > 0 ||
+                //    // notInGameFriendListFriend.Exists(id => id == c.CharacterID) ||
+                //    Service.Configuration.playersNameList.ContainsKey(c.ContentId) ||
+                //    recordAllPlayersInList)
+                //{
+                //    if (!result.TryAdd(c.ContentId, c.NameString))
+                //    {
+                //        Service.PluginLog.Warning($"Duplicate entry {c.ContentId} {c.NameString}");
+                //    }
+                //}
 
             }
             // show different of subList
@@ -135,6 +144,7 @@ namespace UsedName.Manager
             Service.PlayersNamesManager.UpdatePlayerNames(result, difference, false);
 
         }
+
 
         //internal IDictionary<ulong, string>? GetDataFromXivCommon()
         //{
