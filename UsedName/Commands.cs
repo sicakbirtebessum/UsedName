@@ -28,9 +28,10 @@ namespace UsedName
 
         public void OnCommand(string command, string args)
         {
-            if (args == "update" || args == "")
+            if (args == "update")
             {
                 //Service.GameDataManager.UpdateDataFromXivCommon();
+                Service.Chat.Print("Command `/pname update` currently not available");
 
             }
             else if (args.StartsWith("search"))
@@ -64,7 +65,7 @@ namespace UsedName
             {
                 Service.ConfigWindow.Toggle();
             }
-            else if (args.StartsWith("main"))
+            else if (args.StartsWith("main") || args == "")
             {
                 Service.MainWindow.Toggle();
             }

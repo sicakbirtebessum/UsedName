@@ -70,5 +70,6 @@
   "NewAdventurer": "新人",
   "Players in the subscription list will be\nautomatically removed after successful capture of information\nor cleared when closing the game": "订阅名单里的玩家\n会在成功获取到信息后\n自动移除，或者在关闭游戏时清空",
   "WARNING: There may be other players with the same name\nPlease verify target before editing": "警告: 可能有同名玩家\n请谨慎编辑",
-  "Successfully added {0} to plguin's player list":  "{0} 成功添加到插件的好友列表"
+  "Successfully added {0} to plguin's player list": "{0} 成功添加到插件的好友列表",
+  "Command `/pname update` currently not available":  "命令`/pname update`目前不可用"
 }
