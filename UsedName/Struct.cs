@@ -18,8 +18,8 @@ public enum ListType : byte
     MembersOnlineAndOnHomeWorld = 5,
     CompanyMember = 6,
     ApplicationOfCompany = 7,
-    Mentor = 10,
-    NewAdventurer = 11
+    Mentor = 12,
+    NewAdventurer = 13
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x470)]
@@ -95,7 +95,7 @@ public unsafe struct CharacterEntry
     // [FieldOffset(0x26)] public ushort CurrentLevel;
     // [FieldOffset(0x28)] public ushort SelectLevel;
     // [FieldOffset(0x2A)] public byte Identity;
-    //[FieldOffset(0x3A)] public ushort HomeWorldID;
+    [FieldOffset(0x42)] public ushort HomeWorldID;
     [FieldOffset(0x44)] private fixed byte CharacterNameBytes[32];
     [FieldOffset(0x64)] private fixed byte FcTagBytes[7];
 

@@ -31,7 +31,7 @@ namespace UsedName
             if (args == "update")
             {
                 //Service.GameDataManager.UpdateDataFromXivCommon();
-                Service.Chat.Print("Command `/pname update` currently not available");
+                Service.Chat.Print(Service.Loc.Localize("Command `/pname update` currently not available"));
 
             }
             else if (args.StartsWith("search"))

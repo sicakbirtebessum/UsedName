@@ -79,7 +79,7 @@ namespace UsedName.Manager
             if (listType is null)
             {
 #if DEBUG
-                var hint = $"UsedName: Find Unknown type: {socialList.ListTypeByte}";
+                var hint = $"UsedName: Find Unknown type: {socialList.ListTypeByte}, please contact developer";
                 Service.Chat.Print(hint);
                 foreach (var character in socialList.CharacterEntries)
                 {
