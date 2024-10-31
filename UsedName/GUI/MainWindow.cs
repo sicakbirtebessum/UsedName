@@ -23,10 +23,19 @@ public class MainWindow : Window, IDisposable
     {
         GC.SuppressFinalize(this);
     }
-    private readonly string[] TableColum = new string[]
+
+    private string[] TableColum
     {
-        "CurrentName","NickName","FirstUsedName","ShowMoreUsedName","Edit","Remove"
-    };
+        get
+        {
+            if (Service.Configuration.ShowCidInList)
+            {
+                return ["CID", "CurrentName", "NickName", "FirstUsedName", "ShowMoreUsedName", "Edit", "Remove"];
+            }
+
+            return ["CurrentName", "NickName", "FirstUsedName", "ShowMoreUsedName", "Edit", "Remove"];
+        }
+    }
 
     private string _searchContent = "";
 
@@ -55,12 +64,37 @@ public class MainWindow : Window, IDisposable
             foreach (var (id, player) in Service.PlayersNamesManager.SearchPlayer(_searchContent,true,false))
             {
                 ImGui.TableNextRow();
+                if (Service.Configuration.ShowCidInList)
+                {
+                    ImGui.TableNextColumn();
+                    ImGui.Text(id.ToString());
+                    if (ImGui.IsItemHovered())
+                    {
+                        ImGui.SetTooltip(Service.Loc.Localize("Left click to copy"));
+                        if (ImGui.IsMouseClicked(ImGuiMouseButton.Left)) ImGui.SetClipboardText(id.ToString());
+                    }
+                }
                 ImGui.TableNextColumn();
                 ImGui.Text(player.currentName);
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip(Service.Loc.Localize("Left click to copy"));
+                    if (ImGui.IsMouseClicked(ImGuiMouseButton.Left)) ImGui.SetClipboardText(player.currentName);
+                }
                 ImGui.TableNextColumn();
                 ImGui.Text(player.nickName);
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip(Service.Loc.Localize("Left click to copy"));
+                    if (ImGui.IsMouseClicked(ImGuiMouseButton.Left)) ImGui.SetClipboardText(player.nickName);
+                }
                 ImGui.TableNextColumn();
                 ImGui.Text(player.firstUsedname);
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip(Service.Loc.Localize("Left click to copy"));
+                    if (ImGui.IsMouseClicked(ImGuiMouseButton.Left)) ImGui.SetClipboardText(player.firstUsedname);
+                }
                 ImGui.TableNextColumn();
                 if (ImGui.Button(Service.Loc.Localize("Show") + $"##{index}"))
                 {

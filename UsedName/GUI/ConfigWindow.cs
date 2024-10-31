@@ -165,6 +165,10 @@ namespace UsedName.GUI
                 }
                 ImGui.Unindent();
             }
+            if(ImGui.Checkbox(Service.Loc.Localize("Show CID"), ref Service.Configuration.ShowCidInList))
+            {
+                Service.Configuration.Save();
+            }
             if(ImGui.Checkbox(Service.Loc.Localize("Modify Store Path"), ref Service.Configuration.modifyStorePath))
             {
                 Service.Configuration.Save();
