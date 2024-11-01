@@ -169,7 +169,12 @@ namespace UsedName.GUI
             {
                 Service.Configuration.Save();
             }
-            if(ImGui.Checkbox(Service.Loc.Localize("Modify Store Path"), ref Service.Configuration.modifyStorePath))
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip(Service.Loc.Localize("Show stored CID on the Main Window"));
+            }
+
+            if (ImGui.Checkbox(Service.Loc.Localize("Modify Store Path"), ref Service.Configuration.modifyStorePath))
             {
                 Service.Configuration.Save();
             }
