@@ -1,10 +1,10 @@
 ﻿using Dalamud.Utility;
-using FFXIVClientStructs.FFXIV.Client.UI.Info;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
 using System.Text;
+using static FFXIVClientStructs.FFXIV.Client.UI.Info.InfoProxyCommonList.CharacterData;
 
 namespace UsedName.Structs;
 
@@ -55,7 +55,7 @@ public unsafe struct SocialListResult
 [StructLayout(LayoutKind.Explicit, Size = 0x70, Pack = 1)]
 public unsafe struct CharacterEntry
 {
-    [FieldOffset(0x00)] public ulong CharacterID;
+    [FieldOffset(0x00)] public ulong CharacterID; //LocalContentId
     // TODO: Check Timestamp if it still works, or i need merge Timestamp and TerritoryID to ulong
     //[FieldOffset(0x08)] public uint Timestamp;
     //[FieldOffset(0x0C)] public uint TerritoryID;
@@ -95,6 +95,20 @@ public unsafe struct CharacterEntry
     // [FieldOffset(0x26)] public ushort CurrentLevel;
     // [FieldOffset(0x28)] public ushort SelectLevel;
     // [FieldOffset(0x2A)] public byte Identity;
+
+    /// <summary>
+    /// Only seems to be set for certain kind of social lists, e.g. friend list/FC members doesn't include any.
+    /// </summary>
+    [FieldOffset(0x18)] public readonly ulong AccountId;
+
+    [FieldOffset(0x24)] public ushort TerritoryTypeID;
+    [FieldOffset(0x28)] public FFXIVClientStructs.FFXIV.Client.UI.Agent.GrandCompany GrandCompanyId;
+    [FieldOffset(0x29)] public Language ClientLanguage;
+    [FieldOffset(0x2A)] public LanguageMask Languages;
+    [FieldOffset(0x2B)] public byte HasSearchComment;
+    [FieldOffset(0x30)] public ulong OnlineStatusBytes;
+    [FieldOffset(0x38)] public byte CurrentJobId;
+    [FieldOffset(0x3A)] public byte CurrentJobLevel;
     [FieldOffset(0x42)] public ushort HomeWorldID;
     [FieldOffset(0x44)] private fixed byte CharacterNameBytes[32];
     [FieldOffset(0x64)] private fixed byte FcTagBytes[7];
@@ -122,23 +136,24 @@ public unsafe struct CharacterEntry
         }
         set { }
     }
-    //public ExcelResolver<ClassJob> CurrentClassJob => new(this.CurrentClassID);
+    public ExcelResolver<ClassJob> CurrentClassJob => new(this.CurrentJobId);
+    public ExcelResolver<World> HomeWorld => new(this.HomeWorldID);
     //public ExcelResolver<ContentFinderCondition> ContentFinderCondition => new(this.ContentFinderConditionID);
-    //public ExcelResolver<TerritoryType>? TerritoryType
-    //{
-    //    get
-    //    {
-    //        if (this.TerritoryTypeID != 0)
-    //        {
-    //            return new ExcelResolver<TerritoryType>(this.TerritoryTypeID);
-    //        }
-    //        else
-    //        {
-    //            return null;
-    //        }
-    //    }
-    //    set { }
-    //}
+    public ExcelResolver<TerritoryType>? TerritoryType
+    {
+        get
+        {
+            if (this.TerritoryTypeID != 0)
+            {
+                return new ExcelResolver<TerritoryType>(this.TerritoryTypeID);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        set { }
+    }
 
     //public List<ExcelResolver<OnlineStatus>> OnlineStatus
     //{

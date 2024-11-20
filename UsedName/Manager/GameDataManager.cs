@@ -1,11 +1,14 @@
 ﻿using Dalamud.Hooking;
 using Dalamud.Utility;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Info;
+using Lumina.Excel.Sheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using UsedName.Structs;
+using static FFXIVClientStructs.FFXIV.Client.UI.Info.InfoProxyCommonList.CharacterData;
 
 namespace UsedName.Manager
 {
@@ -103,7 +106,17 @@ namespace UsedName.Manager
             foreach (var c in socialList.CharacterEntries)
             {
 #if DEBUG
-                Service.PluginLog.Debug($"{c.CharacterName} {c.FcTag} {c.CharacterID} ");
+                Service.PluginLog.Debug($"{c.CharacterName} {c.FcTag} {c.CharacterID} " +
+                    $"AccId:{c.AccountId} " +
+                    $"Job:{c.CurrentClassJob.GameData.Value.Abbreviation} ({c.CurrentClassJob.Id}) " +
+                    $"JobLvl:{c.CurrentJobLevel} " +
+                    $"HWorld:{c.HomeWorld.GameData.Value.Name} ({c.HomeWorld.Id}) " +
+                    $"HasComment:{(c.HasSearchComment != 0).ToString()} " +
+                    $"GC:{(FFXIVClientStructs.FFXIV.Client.UI.Agent.GrandCompany)c.GrandCompanyId} " +
+                    $"Languages:{c.Languages} " +
+                    $"ClientLanguage:{c.ClientLanguage} " +
+                    $"Statuses:{(InfoProxyCommonList.CharacterData.OnlineStatus)c.OnlineStatusBytes} " +
+                    $"Territory:{c.TerritoryType?.GameData.Value.PlaceName.Value.Name}");
 #endif
                 if (c.CharacterID == 0 ||
                     c.CharacterID == Service.ClientState.LocalContentId ||

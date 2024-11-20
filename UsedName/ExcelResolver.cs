@@ -4,7 +4,7 @@ using Lumina.Excel;
 
 namespace UsedName;
 
-public class ExcelResolver<T> where T : ExcelRow
+public class ExcelResolver<T> where T : struct, Lumina.Excel.IExcelRow<T>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ExcelResolver{T}"/> class.

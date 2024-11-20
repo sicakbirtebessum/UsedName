@@ -3,7 +3,7 @@ using System.Linq;
 using Dalamud.Game.Gui.ContextMenu;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace UsedName;
 
@@ -41,7 +41,7 @@ public class ContextMenu
             case "CrossWorldLinkshell":
             case "ContentMemberList": // Eureka/Bozja/...
             case "BeginnerChatList":
-                return menuTargetDefault.TargetName != null && menuTargetDefault.TargetHomeWorld.Id != 0 && menuTargetDefault.TargetHomeWorld.Id != 65535;
+                return menuTargetDefault.TargetName != null && menuTargetDefault.TargetHomeWorld.RowId != 0 && menuTargetDefault.TargetHomeWorld.RowId != 65535;
             case "BlackList":
                 return menuTargetDefault.TargetName != string.Empty;
 
@@ -113,7 +113,7 @@ public class ContextMenu
         {
             return;
         }
-        var world = Service.DataManager.GetExcelSheet<World>()?.FirstOrDefault(x => x.RowId == menuTargetDefault.TargetHomeWorld.Id);
+        var world = Service.DataManager.GetExcelSheet<World>()?.FirstOrDefault(x => x.RowId == menuTargetDefault.TargetHomeWorld.RowId);
         if (world == null)
             return;
         var playerName = (menuTargetDefault.TargetName ?? new SeString()).ToString();
